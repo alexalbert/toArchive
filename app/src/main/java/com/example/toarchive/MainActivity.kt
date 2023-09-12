@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         val type = intent.type
 
         if ("android.intent.action.SEND".equals(action) && type != null && "text/plain".equals(type)) {
-            val url = intent.getStringExtra("android.intent.extra.TEXT")
+            val destinationUrl = intent.getStringExtra("android.intent.extra.TEXT")
 
             setContent {
                 ToArchiveTheme {
@@ -37,18 +37,10 @@ class MainActivity : ComponentActivity() {
 
                                     webViewClient = object : WebViewClient() {
                                         override fun onPageFinished(view: WebView?, url: String?) {
-                                            // Check if the page is loaded
-//                                        if (view!!.isShown) {
-//                                            return
-//                                        }
-
-                                            val url =
-                                                "https://www.nytimes.com/live/2023/09/11/world/earthquake-morocco-marrakesh"
-
                                             // Populate a field in HTML
                                             val js = String.format(
                                                 "document.getElementById('url').value = '%s'",
-                                                url
+                                                destinationUrl
                                             )
                                             evaluateJavascript(js, null)
                                             evaluateJavascript(
