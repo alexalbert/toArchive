@@ -1,7 +1,7 @@
 package com.example.toarchive
 
 import android.os.Bundle
-import android.view.KeyEvent
+import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
@@ -35,25 +35,12 @@ class MainActivity : ComponentActivity() {
                                 WebView(context).apply {
                                     settings.javaScriptEnabled = true
 
-                                    webViewClient = object : WebViewClient() {
+                                    webViewClient = object : MyWebViewClient() {
                                         override fun onPageFinished(view: WebView?, url: String?) {
                                             // Populate a field in HTML
-                                            val js = String.format(
-                                                "document.getElementById('url').value = '%s'",
-                                                destinationUrl
-                                            )
+                                            var js = String.format("document.getElementById('url').value = '%s';", destinationUrl)
+                                            js += "document.forms['submiturl'].submit();"
                                             evaluateJavascript(js, null)
-                                            evaluateJavascript(
-                                                "document.getElementById('url').focus()",
-                                                null
-                                            )
-
-                                            val keyboardEvent = KeyEvent(
-                                                KeyEvent.ACTION_DOWN,
-                                                KeyEvent.KEYCODE_ENTER
-                                            )
-                                            // Dispatch the KeyboardEvent object to the WebView object
-                                            dispatchKeyEvent(keyboardEvent)
                                         }
                                     }
                                     loadUrl("https://www.archive.md")
@@ -64,5 +51,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+open class MyWebViewClient : WebViewClient() {
+    override fun onReceivedError(
+        view: WebView?,
+        errorCode: Int,
+        description: String?,
+        failingUrl: String?
+    ) {
+        val message = "JS Error: ${description} at URL ${failingUrl} }"
+        Log.e("WebView", message)
     }
 }
